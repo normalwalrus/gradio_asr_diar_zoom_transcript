@@ -1,0 +1,7 @@
+pretrained_models/*
+audio/*
+outputs/*
+text/*
+venv/*
+archive/*
+.qodo/*

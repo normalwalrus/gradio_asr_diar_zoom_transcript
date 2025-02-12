@@ -1,0 +1,112 @@
+[tool.poetry]
+name = "whisper-asr-fastapi-service"
+version = "0.1.0"
+description = ""
+authors = ["test-dan-run <test-dan-run@users.noreply.github.com>"]
+packages = [{include = "asr_inference_service"}]
+
+[tool.poetry.dependencies]
+python = "~3.11"
+librosa = "0.10.2"
+soundfile = "0.12.1"
+torch = {version = "2.3.1", source = "torch121"}
+transformers = "4.42.3"
+pyyaml = "^6.0.2"
+pyannote-audio = "^3.3.2"
+cython = "0.29.35"
+ffmpeg = "^1.4"
+sox = "^1.5.0"
+wget = "^3.2"
+pandas = "^2.2.3"
+denoiser = "0.1.5"
+ruff = "0.9.3"
+gradio = "^5.15.0"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.9.0"
+isort = "^5.13.2"
+
+
+[tool.poetry.scripts]
+start = "asr_inference_service.main:start"
+
+[[tool.poetry.source]]
+name = "torch121"
+url = "https://download.pytorch.org/whl/cu121"
+priority = "explicit"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+]
+
+# Same as Black.
+line-length = 88
+indent-width = 4
+
+# Assume Python 3.11
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle warnings
+    "W",
+    # mccabe
+    "C90",
+    # Pylint
+    "PL",
+    # isort
+    "I",
+    # Pyflakes
+    "F"
+]
+ignore = [
+    "PLR0913",
+]
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"

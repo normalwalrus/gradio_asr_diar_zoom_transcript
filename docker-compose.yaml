@@ -1,0 +1,31 @@
+services:
+  asr-hr-service:
+    container_name: asr-hr-service
+    image: dinohub-asr/whisper-asr-hr-service:0.0.1
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    env_file: .env.dev
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - $PWD/main.py:/opt/app-root/main.py
+      - $PWD/asr_inference_service:/opt/app-root/asr_inference_service
+      - $PWD/pretrained_models:/opt/app-root/pretrained_models
+      - $PWD/utils:/opt/app-root/utils
+    ports:
+      - 7860:7860
+    command:
+      #["bash"]
+      [
+        "python3",
+        "main.py"
+      ]
