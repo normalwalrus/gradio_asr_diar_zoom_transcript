@@ -92,7 +92,7 @@ ENV BASH_ENV="$VENV_PATH/bin/activate" \
 
 
 #RUN ["python", "-c", "from nemo.collections.asr.models.msdd_models import NeuralDiarizer; NeuralDiarizer.from_pretrained('diar_msdd_telephonic')"]
-RUN ["python", "-c", "from pyannote.audio import Pipeline; Pipeline.from_pretrained('pyannote/speaker-diarization-3.1',use_auth_token='HF_TOKEN')"]
+RUN ["python", "-c", "from pyannote.audio import Pipeline; Pipeline.from_pretrained('pyannote/speaker-diarization-3.1',use_auth_token='HF_TOKEN_HERE')"]
 
 EXPOSE 7860
 ENV GRADIO_SERVER_NAME="0.0.0.0"

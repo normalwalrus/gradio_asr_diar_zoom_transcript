@@ -29,6 +29,7 @@ model = ASRModelForInference(
 
 SAMPLE_RATE = int(os.environ["SAMPLE_RATE"])
 
+default_download_button = gr.DownloadButton(label="Load the .txt file to download", value=None)
 
 def timestamp_logic(file_input, speaker: str):
     """
@@ -57,6 +58,9 @@ def transcription_logic(audio_filepath, file_input=None, speaker=None, offset_se
     4. Returns the transcription
 
     """
+    
+    if audio_filepath == None:
+        return
 
     data, samplerate = librosa.load(audio_filepath)
 
@@ -135,20 +139,32 @@ def transcription_logic(audio_filepath, file_input=None, speaker=None, offset_se
     return transcription
 
 
-def download_logic(transcription):
+def download_logic(transcription, speaker_choice = None):
     """
     Download logic to download the transcript
     """
-
-    if transcription == None:
-        return
-
-    output_filepath = f"transcription.txt"
+    print(f"Speaker choice for downloading: {speaker_choice}")
+    
+    if transcription == None or len(transcription) == 0:
+        return default_download_button
+    
+    if speaker_choice:
+        output_filepath = f"interview_{speaker_choice}_transcription.txt"
+    else:
+        output_filepath = f"transcription.txt"
 
     with open(output_filepath, "w") as text_file:
         text_file.write(transcription)
+        
+    download_button = gr.DownloadButton(label=f"Download {output_filepath}", value=output_filepath)
 
-    return output_filepath
+    return download_button
+
+def reset_download_button():
+    '''
+    When audio file is uploaded, reset the download button
+    '''
+    return default_download_button
 
 
 """
@@ -164,6 +180,8 @@ with gr.Blocks() as demo:
 
             file_input = gr.File(label="Zoom Transcript")
             speaker_choice = gr.Radio([], label="Choose Interviewee: ")
+            
+            transcribe_button = gr.Button("Start Transcription!")
 
             file_input.change(get_speakers_names, file_input, speaker_choice)
 
@@ -175,15 +193,21 @@ with gr.Blocks() as demo:
             speaker_choice.input(
                 timestamp_logic, [file_input, speaker_choice], timestamps_outputs
             )
-
-            audio_input.upload(
+            
+            transcribe_button.click(
                 transcription_logic,
                 [audio_input, file_input, speaker_choice],
                 transcript_outputs,
             )
             
-            download_button = gr.DownloadButton(label="Download the .txt file (Click me twice for dowload)", value=filepath)
-            download_button.click(download_logic, transcript_outputs, download_button)
+            download_button = gr.DownloadButton(label="Load the .txt file to download", value=None)
+            download_button.click(download_logic, [transcript_outputs[0], speaker_choice], download_button)
+            
+            audio_input.upload(
+                reset_download_button,
+                None,
+                download_button
+            )
 
 
 if __name__ == "__main__":
