@@ -24,7 +24,6 @@ services:
     ports:
       - 7860:7860
     command:
-      #["bash"]
       [
         "python3",
         "main.py"

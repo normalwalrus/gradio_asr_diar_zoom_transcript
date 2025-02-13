@@ -1,4 +1,4 @@
-import collections
+from collections import Counter, defaultdict
 import logging
 import re
 
@@ -34,8 +34,7 @@ def get_speakers_names(filepath):
 
     return speaker_checkbox
 
-
-def get_timestamps_for_speaker(speaker, file):
+def get_timestamps_for_speaker_timestamps(speaker, file):
     """
     Get the start and end timestamps for a given speaker (from zoom transcript template)
 
@@ -56,6 +55,23 @@ def get_timestamps_for_speaker(speaker, file):
     end_time = matches[-1][1]
 
     return start_time, end_time, matches
+
+
+
+def get_timestamps_for_speaker(file):
+    """
+    Get the start and end timestamps for a given speaker (from zoom transcript template)
+
+    returns start_timestamp, end_timestamp and all timestamps found
+    """
+    text = read_txt_file(file)
+
+    pattern = (
+        r"(\d{2}:\d{2}:\d{2}\.\d{3})\s+-->\s+(\d{2}:\d{2}:\d{2}\.\d{3})\n(.+?):"
+    )
+    matches = re.findall(pattern, text)
+
+    return matches
 
 
 def replacement_of_string_in_text(text, old_text, replacement_text):
@@ -80,8 +96,8 @@ def convert_list_of_timestamps_to_seconds(time_intervals):
     """
 
     average_intervals = [
-        ((convert_to_seconds(start) + convert_to_seconds(end)) / 2)
-        for start, end in time_intervals
+        [((convert_to_seconds(start) + convert_to_seconds(end)) / 2), speaker]
+        for start, end, speaker in time_intervals
     ]
 
     return average_intervals
@@ -141,19 +157,27 @@ def get_most_frequent_speaker(transcription_time_segments, average_actual_time_s
         for transcription_time_segment in transcription_time_segments:
 
             if (
-                average_time >= transcription_time_segment[0]
-                and average_time <= transcription_time_segment[1]
+                average_time[0] >= transcription_time_segment[0]
+                and average_time[0] <= transcription_time_segment[1]
             ):
 
-                final_speakers.append(transcription_time_segment[2])
+                final_speakers.append([transcription_time_segment[2], average_time[1]])
 
                 continue
+    
+    
+    speaker_names = defaultdict(list)
+    for speaker, name in final_speakers:
+        speaker_names[speaker].append(name)
 
-    interviewee = most_frequent_in_list(final_speakers)
+    # Step 2: Find the most common name for each speaker
+    speaker_most_common = {}
+    for speaker, names in speaker_names.items():
+        most_common_name = Counter(names).most_common(1)[0][0]  # Get the most common name
+        speaker_most_common[speaker] = most_common_name
 
-    logging.info("Interviewee chosen to be : %s", interviewee)
+    return speaker_most_common
 
-    return interviewee
 
 def download_string_as_txt(string):
     '''
