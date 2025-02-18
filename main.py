@@ -209,6 +209,7 @@ with gr.Blocks() as demo:
 
             transcript_outputs = [gr.Textbox(label="Transcription")]
             timestamps_outputs = [gr.Textbox(label="Interview Start and End timestamp")]
+            summarization_outputs = [gr.Textbox(label="Summarization")]
 
             speaker_choice.input(
                 timestamp_logic, [file_input, speaker_choice], timestamps_outputs
