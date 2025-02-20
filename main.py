@@ -50,7 +50,7 @@ def timestamp_logic(file_input, speaker: str):
     return final_string
 
 
-def transcription_logic(audio_filepath, file_input=None, speaker=None, offset_sec=1.5, end_offset_sec=180):
+def transcription_logic(audio_filepath, file_input=None, speaker=None, offset_sec=1.5, end_offset_sec=240):
     """
     Overall Transcription logic, chaining all functionalities tgt:
 
@@ -155,7 +155,7 @@ def transcription_logic(audio_filepath, file_input=None, speaker=None, offset_se
     return transcription
 
 
-def download_logic(transcription, speaker_choice = None):
+def download_logic(transcription, speaker_choice = None, download_button = gr.DownloadButton()):
     """
     Download logic to download the transcript
     """
@@ -171,9 +171,12 @@ def download_logic(transcription, speaker_choice = None):
 
     with open(output_filepath, "w") as text_file:
         text_file.write(transcription)
-        
-    download_button = gr.DownloadButton(label=f"Download {output_filepath}", value=output_filepath)
-
+    
+    if download_button:
+        download_button = default_download_button
+    else:
+        download_button = gr.DownloadButton(label=f"Download {output_filepath}", value=output_filepath)
+    
     return download_button
 
 def reset_download_button():
@@ -222,7 +225,7 @@ with gr.Blocks() as demo:
             )
             
             download_button = gr.DownloadButton(label="Load the .txt file to download", value=None)
-            download_button.click(download_logic, [transcript_outputs[0], speaker_choice], download_button)
+            download_button.click(download_logic, [transcript_outputs[0], speaker_choice, download_button], download_button)
             
             audio_input.upload(
                 reset_download_button,
